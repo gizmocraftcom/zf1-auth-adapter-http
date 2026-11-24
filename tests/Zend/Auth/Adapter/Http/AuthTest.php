@@ -20,6 +20,7 @@
  * @version    $Id$
  */
 
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * @category   Zend
@@ -27,8 +28,8 @@
  * @subpackage UnitTests
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @group      Zend_Auth
  */
+#[Group('Zend_Auth')]
 class Zend_Auth_Adapter_Http_AuthTest extends PHPUnit\Framework\TestCase
 {
     /**
@@ -305,24 +306,20 @@ class Zend_Auth_Adapter_Http_AuthTest extends PHPUnit\Framework\TestCase
     protected function _doAuth($clientHeader, $scheme)
     {
         // Set up stub request and response objects
-        $request  = $this->getMockBuilder('Zend_Controller_Request_Http')->getMock();
+        $request  = $this->createStub('Zend_Controller_Request_Http');
         $response = new Zend_Controller_Response_Http;
         $response->setHttpResponseCode(200);
         $response->headersSentThrowsException = false;
 
         // Set stub method return values
-        $request->expects($this->any())
-                ->method('getRequestUri')
-                ->will($this->returnValue('/'));
-        $request->expects($this->any())
-                ->method('getMethod')
-                ->will($this->returnValue('GET'));
-        $request->expects($this->any())
-                ->method('getServer')
-                ->will($this->returnValue('PHPUnit'));
-        $request->expects($this->any())
-                ->method('getHeader')
-                ->will($this->returnValue($clientHeader));
+        $request->method('getRequestUri')
+                ->willReturn('/');
+        $request->method('getMethod')
+                ->willReturn('GET');
+        $request->method('getServer')
+                ->willReturn('PHPUnit');
+        $request->method('getHeader')
+                ->willReturn($clientHeader);
 
         // Select an Authentication scheme
         switch ($scheme) {

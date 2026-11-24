@@ -20,6 +20,7 @@
  * @version    $Id$
  */
 
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * @category   Zend
@@ -27,8 +28,8 @@
  * @subpackage UnitTests
  * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @group      Zend_Auth
  */
+#[Group('Zend_Auth')]
 class Zend_Auth_Adapter_Http_ObjectTest extends PHPUnit\Framework\TestCase
 {
     /**
@@ -182,8 +183,8 @@ class Zend_Auth_Adapter_Http_ObjectTest extends PHPUnit\Framework\TestCase
             $this->assertSame('Request and Response objects must be set before calling authenticate()', $e->getMessage());
         }
 
-        $request  = $this->getMockBuilder('Zend_Controller_Request_Http')->getMock();
-        $response = $this->getMockBuilder('Zend_Controller_Response_Http')->getMock();
+        $request  = $this->createStub('Zend_Controller_Request_Http');
+        $response = $this->createStub('Zend_Controller_Response_Http');
 
         // If this throws an exception, it fails
         $a->setRequest($request)
@@ -193,13 +194,12 @@ class Zend_Auth_Adapter_Http_ObjectTest extends PHPUnit\Framework\TestCase
 
     public function testNoResolvers()
     {
-        $request  = $this->getMockBuilder('Zend_Controller_Request_Http')->getMock();
-        $response = $this->getMockBuilder('Zend_Controller_Response_Http')->getMock();
+        $request  = $this->createStub('Zend_Controller_Request_Http');
+        $response = $this->createStub('Zend_Controller_Response_Http');
 
         // Stub request for Basic auth
-        $request->expects($this->any())
-                ->method('getHeader')
-                ->will($this->returnValue('Basic <followed by a space caracter'));
+        $request->method('getHeader')
+                ->willReturn('Basic <followed by a space caracter');
 
         // Once for Basic
         try {
@@ -215,10 +215,9 @@ class Zend_Auth_Adapter_Http_ObjectTest extends PHPUnit\Framework\TestCase
         }
 
         // Stub request for Digest auth, must be reseted (recreated)
-        $request = $this->getMockBuilder('Zend_Controller_Request_Http')->getMock();
-        $request->expects($this->any())
-                ->method('getHeader')
-                ->will($this->returnValue('Digest <followed by a space caracter'));
+        $request = $this->createStub('Zend_Controller_Request_Http');
+        $request->method('getHeader')
+                ->willReturn('Digest <followed by a space caracter');
 
         // Once for Digest
         try {
@@ -236,11 +235,10 @@ class Zend_Auth_Adapter_Http_ObjectTest extends PHPUnit\Framework\TestCase
 
     public function testWrongResolverUsed()
     {
-        $response = $this->getMockBuilder('Zend_Controller_Response_Http')->getMock();
-        $request  = $this->getMockBuilder('Zend_Controller_Request_Http')->getMock();
-        $request->expects($this->any())
-                ->method('getHeader')
-                ->will($this->returnValue('Basic <followed by a space caracter')); // A basic Header will be provided by that request
+        $response = $this->createStub('Zend_Controller_Response_Http');
+        $request  = $this->createStub('Zend_Controller_Request_Http');
+        $request->method('getHeader')
+                ->willReturn('Basic <followed by a space caracter'); // A basic Header will be provided by that request
 
         // Test a Digest auth process while the request is containing a Basic auth header
         $a = new Zend_Auth_Adapter_Http($this->_digestConfig);
@@ -253,11 +251,10 @@ class Zend_Auth_Adapter_Http_ObjectTest extends PHPUnit\Framework\TestCase
 
     public function testUnsupportedScheme()
     {
-        $response = $this->getMockBuilder('Zend_Controller_Response_Http')->getMock();
-        $request  = $this->getMockBuilder('Zend_Controller_Request_Http')->getMock();
-        $request->expects($this->any())
-                ->method('getHeader')
-                ->will($this->returnValue('NotSupportedScheme <followed by a space caracter'));
+        $response = $this->createStub('Zend_Controller_Response_Http');
+        $request  = $this->createStub('Zend_Controller_Request_Http');
+        $request->method('getHeader')
+                ->willReturn('NotSupportedScheme <followed by a space caracter');
 
         $a = new Zend_Auth_Adapter_Http($this->_digestConfig);
         $a->setDigestResolver($this->_digestResolver)
