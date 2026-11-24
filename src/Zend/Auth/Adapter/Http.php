@@ -182,24 +182,27 @@ class Zend_Auth_Adapter_Http implements Zend_Auth_Adapter_Interface
 
         // Double-quotes are used to delimit the realm string in the HTTP header,
         // and colons are field delimiters in the password file.
-        if (empty($config['realm']) ||
-            !ctype_print($config['realm']) ||
-            strpos($config['realm'], ':') !== false ||
-            strpos($config['realm'], '"') !== false) {
+        // ctype_print() with a non-string argument is deprecated since PHP 8.1, so cast once.
+        $realm = empty($config['realm']) ? '' : (string) $config['realm'];
+        if ($realm === '' ||
+            !ctype_print($realm) ||
+            strpos($realm, ':') !== false ||
+            strpos($realm, '"') !== false) {
             throw new Zend_Auth_Adapter_Exception('Config key \'realm\' is required, and must contain only printable '
                                                 . 'characters, excluding quotation marks and colons');
         } else {
-            $this->_realm = $config['realm'];
+            $this->_realm = $realm;
         }
 
         if (in_array('digest', $this->_acceptSchemes)) {
-            if (empty($config['digest_domains']) ||
-                !ctype_print($config['digest_domains']) ||
-                strpos($config['digest_domains'], '"') !== false) {
+            $domains = empty($config['digest_domains']) ? '' : (string) $config['digest_domains'];
+            if ($domains === '' ||
+                !ctype_print($domains) ||
+                strpos($domains, '"') !== false) {
                 throw new Zend_Auth_Adapter_Exception('Config key \'digest_domains\' is required, and must contain '
                                                     . 'only printable characters, excluding quotation marks');
             } else {
-                $this->_domains = $config['digest_domains'];
+                $this->_domains = $domains;
             }
 
             if (empty($config['nonce_timeout']) ||
